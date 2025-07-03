@@ -116,61 +116,7 @@ app.get("/api/statistics", async (req, res) => {
   }
 });
 
-// ---------- BAR CHART ----------
-// app.get("/api/bar-chart", async (req, res) => {
-//   try {
-//     const { month } = req.query;
-//     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
 
-//     const priceRanges = [
-//       [0, 100],
-//       [101, 200],
-//       [201, 300],
-//       [301, 400],
-//       [401, 500],
-//       [501, 600],
-//       [601, 700],
-//       [701, 800],
-//       [801, 900],
-//       [901, Infinity],
-//     ];
-
-//     const pipeline = [];
-
-//     for (const [min, max] of priceRanges) {
-//       pipeline.push({
-//         $facet: {
-//           [`${min}-${max === Infinity ? "above" : max}`]: [
-//             {
-//               $match: {
-//                 price: {
-//                   $gte: min,
-//                   ...(max !== Infinity && { $lte: max }),
-//                 },
-//                 $expr: { $eq: [{ $month: "$dateOfSale" }, monthNumber] },
-//               },
-//             },
-//             { $count: "count" },
-//           ],
-//         },
-//       });
-//     }
-
-//     const result = await Transaction.aggregate(pipeline);
-
-//     const response = {};
-
-//     for (const obj of result) {
-//       const key = Object.keys(obj)[0];
-//       response[key] = obj[key][0]?.count || 0;
-//     }
-
-//     res.json(response);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Failed to fetch bar chart data" });
-//   }
-// });
 
 app.get("/api/bar-chart", async (req, res) => {
   try {

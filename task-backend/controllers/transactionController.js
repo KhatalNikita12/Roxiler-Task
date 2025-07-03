@@ -8,23 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect MongoDB
-mongoose.connect(
-  "",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
-
-
-mongoose.connection.on("connected", () => {
-  console.log("✅ MongoDB connected successfully!");
-});
-
-mongoose.connection.on("error", (err) => {
-  console.error("❌ MongoDB connection error:", err);
-});
 
 // ---------- API TO SEED DB ----------
 app.get("/api/init", async (req, res) => {
