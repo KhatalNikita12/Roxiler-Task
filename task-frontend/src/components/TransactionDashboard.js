@@ -46,15 +46,15 @@ const TransactionDashboard = () => {
   ];
 
   const COLORS = [
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#8884D8",
-    "#82CA9D",
+    "#9B5DE5", // purple
+    "#FEE440", // yellow
+    "#3A0CA3", // dark purple
+    "#F15BB5", // pinkish purple
+    "#00BBF9", // cyan
+    "#7209B7", // purple
   ];
 
-  // Fetch transactions from backend
+  // fetch logic unchanged...
   const fetchTransactions = async (page = 1, search = "") => {
     setLoading(true);
     try {
@@ -77,7 +77,6 @@ const TransactionDashboard = () => {
     setLoading(false);
   };
 
-  // Fetch statistics
   const fetchStatistics = async () => {
     try {
       const response = await fetch(
@@ -90,7 +89,6 @@ const TransactionDashboard = () => {
     }
   };
 
-  // Fetch bar chart data
   const fetchBarChartData = async () => {
     try {
       const response = await fetch(
@@ -108,7 +106,6 @@ const TransactionDashboard = () => {
     }
   };
 
-  // Fetch pie chart data
   const fetchPieChartData = async () => {
     try {
       const response = await fetch(
@@ -175,12 +172,13 @@ const TransactionDashboard = () => {
 
   useEffect(() => {
     fetchAllData();
+    // eslint-disable-next-line
   }, [selectedMonth]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-black text-yellow-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <h1 className="text-4xl font-bold text-purple-400 mb-8">
           Transaction Dashboard
         </h1>
 
@@ -189,7 +187,7 @@ const TransactionDashboard = () => {
           <button
             onClick={initializeDatabase}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg disabled:opacity-50"
+            className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-bold transition disabled:opacity-50"
           >
             {loading ? "Initializing..." : "Initialize Database"}
           </button>
@@ -197,13 +195,13 @@ const TransactionDashboard = () => {
 
         {/* Month Selector */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-purple-300 mb-2">
             Select Month:
           </label>
           <select
             value={selectedMonth}
             onChange={handleMonthChange}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-800 text-yellow-50 border border-purple-500 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
           >
             {months.map((month) => (
               <option key={month} value={month}>
@@ -215,36 +213,36 @@ const TransactionDashboard = () => {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-gray-900 p-6 rounded-lg shadow border border-purple-700">
+            <h3 className="text-lg font-semibold text-purple-300 mb-2">
               Total Sale Amount
             </h3>
-            <p className="text-3xl font-bold text-green-600">
+            <p className="text-3xl font-bold text-yellow-400">
               ${statistics.totalSaleAmount?.toFixed(2) || 0}
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-gray-900 p-6 rounded-lg shadow border border-purple-700">
+            <h3 className="text-lg font-semibold text-purple-300 mb-2">
               Total Sold Items
             </h3>
-            <p className="text-3xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-yellow-400">
               {statistics.totalSoldItems || 0}
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="bg-gray-900 p-6 rounded-lg shadow border border-purple-700">
+            <h3 className="text-lg font-semibold text-purple-300 mb-2">
               Total Not Sold Items
             </h3>
-            <p className="text-3xl font-bold text-red-600">
+            <p className="text-3xl font-bold text-yellow-400">
               {statistics.totalNotSoldItems || 0}
             </p>
           </div>
         </div>
 
         {/* Transactions Table */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-gray-900 rounded-lg shadow border border-purple-700 mb-8">
+          <div className="p-6 border-b border-purple-700">
+            <h2 className="text-xl font-semibold text-purple-300 mb-4">
               Transactions
             </h2>
             <div className="flex justify-between items-center">
@@ -253,23 +251,23 @@ const TransactionDashboard = () => {
                 placeholder="Search transactions..."
                 value={searchText}
                 onChange={handleSearch}
-                className="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-gray-800 text-yellow-50 border border-purple-500 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
               <div className="flex gap-2">
                 <button
                   onClick={handlePrevious}
                   disabled={currentPage === 1}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                  className="bg-purple-600 hover:bg-purple-700 text-yellow-50 px-4 py-2 rounded disabled:opacity-50"
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 text-gray-700">
+                <span className="px-4 py-2 text-yellow-200">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={handleNext}
                   disabled={currentPage === totalPages}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded disabled:opacity-50"
+                  className="bg-purple-600 hover:bg-purple-700 text-yellow-50 px-4 py-2 rounded disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -278,61 +276,38 @@ const TransactionDashboard = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-purple-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Sold
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Date
-                  </th>
+                  {["ID","Title","Description","Price","Category","Sold","Date"].map((header) => (
+                    <th
+                      key={header}
+                      className="px-6 py-3 text-left text-xs font-semibold text-yellow-100 uppercase tracking-wider"
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-purple-700">
                 {transactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {transaction.id}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                      {transaction.title}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                      {transaction.description}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={transaction.id} className="hover:bg-purple-700 hover:text-yellow-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-yellow-50">{transaction.id}</td>
+                    <td className="px-6 py-4 text-sm text-yellow-50 max-w-xs truncate">{transaction.title}</td>
+                    <td className="px-6 py-4 text-sm text-yellow-50 max-w-xs truncate">{transaction.description}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-yellow-50">
                       ${transaction.price}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {transaction.category}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-yellow-50">{transaction.category}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          transaction.sold
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                        transaction.sold
+                          ? "bg-yellow-400 text-black"
+                          : "bg-gray-700 text-yellow-50"
+                      }`}>
                         {transaction.sold ? "Sold" : "Not Sold"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-yellow-50">
                       {new Date(transaction.dateOfSale).toLocaleDateString()}
                     </td>
                   </tr>
@@ -344,26 +319,24 @@ const TransactionDashboard = () => {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Bar Chart */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-gray-900 p-6 rounded-lg shadow border border-purple-700">
+            <h2 className="text-xl font-semibold text-purple-300 mb-4">
               Price Range Distribution
             </h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="range" tick={{ fontSize: 12 }} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="count" fill="#8884d8" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#8884d8" />
+                <XAxis dataKey="range" tick={{ fill: "#FEE440", fontSize: 12 }} />
+                <YAxis tick={{ fill: "#FEE440" }} />
+                <Tooltip contentStyle={{ background: "#3A0CA3", color: "#FEE440" }} />
+                <Legend wrapperStyle={{ color: "#FEE440" }} />
+                <Bar dataKey="count" fill="#9B5DE5" />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Pie Chart */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-gray-900 p-6 rounded-lg shadow border border-purple-700">
+            <h2 className="text-xl font-semibold text-purple-300 mb-4">
               Category Distribution
             </h2>
             <ResponsiveContainer width="100%" height={300}>
@@ -375,7 +348,7 @@ const TransactionDashboard = () => {
                   labelLine={false}
                   label={({ category, count }) => `${category}: ${count}`}
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="#9B5DE5"
                   dataKey="count"
                 >
                   {pieChartData.map((entry, index) => (
@@ -385,7 +358,7 @@ const TransactionDashboard = () => {
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ background: "#3A0CA3", color: "#FEE440" }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

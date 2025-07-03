@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect MongoDB
-mongoose.connect("mongodb+srv://khatalnikita2003:W3LQtGeNsYrU4oDF@cluster-proj-db.rbit1ru.mongodb.net/?retryWrites=true&w=majority&appName=cluster-proj-db", {
+mongoose.connect("mongodb://localhost:27017/test", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -117,6 +117,61 @@ app.get("/api/statistics", async (req, res) => {
 });
 
 // ---------- BAR CHART ----------
+// app.get("/api/bar-chart", async (req, res) => {
+//   try {
+//     const { month } = req.query;
+//     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
+
+//     const priceRanges = [
+//       [0, 100],
+//       [101, 200],
+//       [201, 300],
+//       [301, 400],
+//       [401, 500],
+//       [501, 600],
+//       [601, 700],
+//       [701, 800],
+//       [801, 900],
+//       [901, Infinity],
+//     ];
+
+//     const pipeline = [];
+
+//     for (const [min, max] of priceRanges) {
+//       pipeline.push({
+//         $facet: {
+//           [`${min}-${max === Infinity ? "above" : max}`]: [
+//             {
+//               $match: {
+//                 price: {
+//                   $gte: min,
+//                   ...(max !== Infinity && { $lte: max }),
+//                 },
+//                 $expr: { $eq: [{ $month: "$dateOfSale" }, monthNumber] },
+//               },
+//             },
+//             { $count: "count" },
+//           ],
+//         },
+//       });
+//     }
+
+//     const result = await Transaction.aggregate(pipeline);
+
+//     const response = {};
+
+//     for (const obj of result) {
+//       const key = Object.keys(obj)[0];
+//       response[key] = obj[key][0]?.count || 0;
+//     }
+
+//     res.json(response);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Failed to fetch bar chart data" });
+//   }
+// });
+
 app.get("/api/bar-chart", async (req, res) => {
   try {
     const { month } = req.query;
@@ -135,34 +190,40 @@ app.get("/api/bar-chart", async (req, res) => {
       [901, Infinity],
     ];
 
-    const pipeline = [];
-
+    // Single $facet stage with all ranges
+    const facetStage = {};
+    
     for (const [min, max] of priceRanges) {
-      pipeline.push({
-        $facet: {
-          [`${min}-${max === Infinity ? "above" : max}`]: [
-            {
-              $match: {
-                price: {
-                  $gte: min,
-                  ...(max !== Infinity && { $lte: max }),
-                },
-                $expr: { $eq: [{ $month: "$dateOfSale" }, monthNumber] },
-              },
+      const rangeKey = `${min}-${max === Infinity ? "above" : max}`;
+      facetStage[rangeKey] = [
+        {
+          $match: {
+            price: {
+              $gte: min,
+              ...(max !== Infinity && { $lte: max }),
             },
-            { $count: "count" },
-          ],
+            $expr: { $eq: [{ $month: "$dateOfSale" }, monthNumber] },
+          },
         },
-      });
+        { $count: "count" },
+      ];
     }
 
+    const pipeline = [
+      {
+        $facet: facetStage
+      }
+    ];
+
     const result = await Transaction.aggregate(pipeline);
-
+    
+    // Extract counts from the result
     const response = {};
-
-    for (const obj of result) {
-      const key = Object.keys(obj)[0];
-      response[key] = obj[key][0]?.count || 0;
+    const facetResult = result[0]; // $facet returns array with single object
+    
+    for (const [min, max] of priceRanges) {
+      const rangeKey = `${min}-${max === Infinity ? "above" : max}`;
+      response[rangeKey] = facetResult[rangeKey][0]?.count || 0;
     }
 
     res.json(response);
@@ -172,6 +233,101 @@ app.get("/api/bar-chart", async (req, res) => {
   }
 });
 
+// Alternative simpler approach using multiple queries (more readable)
+app.get("/api/bar-chart-simple", async (req, res) => {
+  try {
+    const { month } = req.query;
+    const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
+
+    const priceRanges = [
+      { min: 0, max: 100, label: "0-100" },
+      { min: 101, max: 200, label: "101-200" },
+      { min: 201, max: 300, label: "201-300" },
+      { min: 301, max: 400, label: "301-400" },
+      { min: 401, max: 500, label: "401-500" },
+      { min: 501, max: 600, label: "501-600" },
+      { min: 601, max: 700, label: "601-700" },
+      { min: 701, max: 800, label: "701-800" },
+      { min: 801, max: 900, label: "801-900" },
+      { min: 901, max: Infinity, label: "901-above" },
+    ];
+
+    const response = {};
+
+    // Execute queries for each range
+    for (const range of priceRanges) {
+      const query = {
+        $expr: { $eq: [{ $month: "$dateOfSale" }, monthNumber] },
+        price: {
+          $gte: range.min,
+          ...(range.max !== Infinity && { $lte: range.max }),
+        },
+      };
+
+      const count = await Transaction.countDocuments(query);
+      response[range.label] = count;
+    }
+
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch bar chart data" });
+  }
+});
+
+// Most efficient approach using aggregation with $bucket
+app.get("/api/bar-chart-bucket", async (req, res) => {
+  try {
+    const { month } = req.query;
+    const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
+
+    const pipeline = [
+      {
+        $match: {
+          $expr: { $eq: [{ $month: "$dateOfSale" }, monthNumber] }
+        }
+      },
+      {
+        $bucket: {
+          groupBy: "$price",
+          boundaries: [0, 101, 201, 301, 401, 501, 601, 701, 801, 901],
+          default: "901-above",
+          output: {
+            count: { $sum: 1 }
+          }
+        }
+      }
+    ];
+
+    const result = await Transaction.aggregate(pipeline);
+    
+    // Format the response to match expected format
+    const response = {};
+    const rangeLabels = [
+      "0-100", "101-200", "201-300", "301-400", "401-500",
+      "501-600", "601-700", "701-800", "801-900", "901-above"
+    ];
+    
+    // Initialize all ranges with 0
+    rangeLabels.forEach(label => {
+      response[label] = 0;
+    });
+    
+    // Fill in actual counts
+    result.forEach((bucket, index) => {
+      if (bucket._id === "901-above") {
+        response["901-above"] = bucket.count;
+      } else {
+        response[rangeLabels[index]] = bucket.count;
+      }
+    });
+
+    res.json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch bar chart data" });
+  }
+});
 // ---------- PIE CHART ----------
 app.get("/api/pie-chart", async (req, res) => {
   try {
