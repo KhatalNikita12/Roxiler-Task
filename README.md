@@ -46,3 +46,7 @@ View:
 
 🥧 Pie Chart: Categories
 
+![WhatsApp Image 2025-07-04 at 00 08 04_f2e7cef8](https://github.com/user-attachments/assets/819bf8ca-71dd-4101-b5e6-b4f414bd563a)
+
+![WhatsApp Image 2025-07-04 at 00 08 04_69a9a0bb](https://github.com/user-attachments/assets/664358f0-f7f6-4b1b-a135-a34496d9754f)
+
