@@ -1,16 +1,11 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const axios = require("axios");
-const cors = require("cors");
-const Transaction = require("./models/Transaction");
+const Transaction = require("../models/Transaction");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
+const router = express.Router();
 
 // ---------- API TO SEED DB ----------
-app.get("/api/init", async (req, res) => {
+router.get("/api/init", async (req, res) => {
   try {
     const response = await axios.get(
       "https://s3.amazonaws.com/roxiler.com/product_transaction.json"
@@ -25,7 +20,7 @@ app.get("/api/init", async (req, res) => {
 });
 
 // ---------- LIST TRANSACTIONS ----------
-app.get("/api/transactions", async (req, res) => {
+router.get("/api/transactions", async (req, res) => {
   try {
     const { month, search = "", page = 1, perPage = 2 } = req.query;
 
@@ -67,7 +62,7 @@ app.get("/api/transactions", async (req, res) => {
 });
 
 // ---------- STATISTICS ----------
-app.get("/api/statistics", async (req, res) => {
+router.get("/api/statistics", async (req, res) => {
   try {
     const { month } = req.query;
     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
@@ -105,7 +100,7 @@ app.get("/api/statistics", async (req, res) => {
 });
 
 // ---------- BAR CHART ----------
-app.get("/api/bar-chart", async (req, res) => {
+router.get("/api/bar-chart", async (req, res) => {
   try {
     const { month } = req.query;
     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
@@ -165,7 +160,7 @@ app.get("/api/bar-chart", async (req, res) => {
 });
 
 // ---------- SIMPLE BAR CHART ----------
-app.get("/api/bar-chart-simple", async (req, res) => {
+router.get("/api/bar-chart-simple", async (req, res) => {
   try {
     const { month } = req.query;
     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
@@ -206,7 +201,7 @@ app.get("/api/bar-chart-simple", async (req, res) => {
 });
 
 // ---------- BAR CHART BUCKET ----------
-app.get("/api/bar-chart-bucket", async (req, res) => {
+router.get("/api/bar-chart-bucket", async (req, res) => {
   try {
     const { month } = req.query;
     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
@@ -265,7 +260,7 @@ app.get("/api/bar-chart-bucket", async (req, res) => {
 });
 
 // ---------- PIE CHART ----------
-app.get("/api/pie-chart", async (req, res) => {
+router.get("/api/pie-chart", async (req, res) => {
   try {
     const { month } = req.query;
     const monthNumber = new Date(`${month} 1, 2000`).getMonth() + 1;
@@ -297,7 +292,7 @@ app.get("/api/pie-chart", async (req, res) => {
 });
 
 // ---------- DASHBOARD ----------
-app.get("/api/dashboard", async (req, res) => {
+router.get("/api/dashboard", async (req, res) => {
   try {
     const { month } = req.query;
 
@@ -321,4 +316,4 @@ app.get("/api/dashboard", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+module.exports = router;
